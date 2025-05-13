@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ESP32 OLED Text Control</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(to right, #f0f4f8, #d9e2ec);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background-color: #ffffff;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #1f2937;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      border: 1px solid #cbd5e0;
+      border-radius: 8px;
+      outline: none;
+      transition: border 0.3s ease;
+    }
+
+    input[type="text"]:focus {
+      border-color: #3b82f6;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background-color: #3b82f6;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #2563eb;
+    }
+
+    .status {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #10b981;
+    }
+
+    .error {
+      color: #ef4444;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>ESP32 OLED Display</h2>
+    <input type="text" id="textInput" placeholder="Enter text to display" />
+    <button id="submitBtn">Update Text</button>
+    <div id="statusMessage" class="status"></div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAh2cMDej1uDLpLLAFlsShipkkRJCrBu64",
+      authDomain: "iot-display-project-31818.firebaseapp.com",
+      databaseURL: "https://iot-display-project-31818-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "iot-display-project-31818",
+      storageBucket: "iot-display-project-31818.appspot.com",
+      messagingSenderId: "875404973147",
+      appId: "1:875404973147:web:edf841a6133f4bca561b7e",
+      measurementId: "G-TDXJS7BEPH"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    function updateDeviceText(newText) {
+      const status = document.getElementById("statusMessage");
+      set(ref(db, 'deviceText'), newText)
+        .then(() => {
+          status.textContent = "✅ Text updated successfully!";
+          status.className = "status";
+        })
+        .catch((error) => {
+          status.textContent = "❌ Error: " + error.message;
+          status.className = "status error";
+        });
+    }
+
+    document.getElementById("submitBtn").addEventListener("click", () => {
+      const newText = document.getElementById("textInput").value.trim();
+      if (newText.length === 0) return;
+      updateDeviceText(newText);
+    });
+  </script>
+</body>
+</html>
